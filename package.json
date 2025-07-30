@@ -1,0 +1,23 @@
+{
+  "name": "serverless-framework-py2",
+  "version": "1.0.0",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "start:offline": "sls offline start",
+    "dynamodb:install": "sls dynamodb install",
+    "dynamodb:start": "sls dynamodb start"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "serverless": "^4.17.2",
+    "serverless-dynamodb": "^0.2.56",
+    "serverless-offline": "^14.4.0",
+    "serverless-python-requirements": "^6.1.2"
+  }
+}

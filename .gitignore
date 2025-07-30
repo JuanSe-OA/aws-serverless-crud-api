@@ -1,0 +1,38 @@
+# Entornos virtuales
+venv/
+.venv/
+env/
+.env
+
+# Archivos de Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Dependencias de Node.js
+node_modules/
+
+# Archivos del Framework Serverless
+.serverless/
+
+# Archivos de logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos de IDE y editores
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Archivos de test
+.pytest_cache/
+.coverage
