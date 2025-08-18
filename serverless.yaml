@@ -1,0 +1,143 @@
+service: serverless-framework-py
+provider:
+  name: aws
+  runtime: python3.9
+  apiGateway:
+    apikeys:
+      - crud-serverless-users-apikey
+  region: us-east-1
+  environment:
+    TABLE_NAME: usersTable
+    BUCKET : bucket-serverless-py-122
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:*
+          Resource:
+            - arn:aws:dynamodb:us-east-1:171910350564:table/usersTable
+        - Effect: Allow
+          Action:
+            - s3:*
+          Resource:
+            - arn:aws:s3:::bucket-serverless-py-122/*
+
+plugins:
+  - serverless-python-requirements
+  - serverless-offline
+  - serverless-dynamodb
+
+package:
+  individually: true
+  patterns:
+    - 'src/**'
+    - '!node_modules/**'
+    - '!.venv/**'
+    - '!.dynamodb/**'
+    - '!tests/**'
+    - '!.git/**'
+    - '!__pycache__/**'
+    - '!*.pyc'
+    - '!package-lock.json'
+    - '!.env'
+    - '!*.zip'
+
+
+custom:
+  serverless-dynamodb:
+    stages:
+      - dev
+    start:
+      port: 8000
+      inMemory: true
+      migrate: true
+
+  pythonRequirements:
+    dockerizePip: false
+    slim: true
+    strip: true
+
+functions:
+  getUsers:
+    handler: src/users/getUsers/handler.get_user
+    events:
+      - http: 
+          private: true
+          path: users/{id}
+          method: GET
+          request:
+            parameters:
+              paths:
+                id: true
+  createUser:
+    handler: src/users/createUsers/handler.create_user
+    events:
+      - http:
+          path: users
+          method: POST
+          request:
+            schemas:
+              application/json: ${file(schemas/user-schema.json)}
+
+  updateUsers:
+    handler: src/users/updateUsers/handler.update_user
+    events:
+      - http:
+          path: users/{id}
+          method: PUT
+          request:
+            parameters:
+              paths:
+                id: true
+            schemas:
+              application/json: ${file(schemas/user-schema.json)}
+
+
+  deleteUsers:
+    handler: src/users/deleteUsers/handler.delete_user
+    events:
+      - http:
+          path: users/{id}
+          method: DELETE
+          request:
+            parameters:
+              paths:
+                id: true
+
+  signedURL:
+    handler: src/signedurl/handler.signeds3_url
+    events:
+      - http:
+          path: signedurl
+          method: GET
+          request:
+            parameters:
+              querystrings:
+                filename: true
+
+  thumbGenerator:
+    handler: src/thumbnailGenerator/handler.thumbnail_generator
+    layers:
+      - { Ref: BaseLambdaLayer }
+    package:
+      patterns:
+        - "src/thumbnailGenerator/**"
+    events:
+      - s3:
+          bucket: bucket-serverless-py-122
+          event: s3:ObjectCreated:*
+          existing: true
+          rules:
+            - prefix: upload/
+  
+layers:
+  base:
+    path: layer
+    name: prd-dependencies
+    compatibleRuntimes:
+      - python3.9
+
+
+
+ 

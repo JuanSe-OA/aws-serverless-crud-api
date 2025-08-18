@@ -13,7 +13,7 @@ if os.environ.get('IS_OFFLINE'):
     }
 
 dynamodb = boto3.resource('dynamodb', **dynamodb_client_params)
-table = dynamodb.Table('usersTable')
+table = dynamodb.Table(os.environ['TABLE_NAME'])
 
 def update_user(event, context):
     response = {
