@@ -36,3 +36,8 @@ Thumbs.db
 # Archivos de test
 .pytest_cache/
 .coverage
+# ========================
+# AWS Lambda Layers
+# ========================
+layer/
+layer.zip
