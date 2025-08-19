@@ -7,7 +7,7 @@ El objetivo es exponer un API CRUD seguro, con manejo de usuarios, subida de arc
 
 ## 🛠️ Arquitectura
 
-![Arquitectura del Proyecto](./docs/arquitectura.png)
+![Arquitectura del Proyecto](docs/arquitectura.png)
 
 - **API Gateway**: Puerta de entrada para los clientes (usuarios, Postman, frontend).  
 - **Custom Authorizer (Lambda)**: Valida tokens/API Keys para controlar el acceso.  
