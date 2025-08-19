@@ -1,14 +1,12 @@
 service: serverless-framework-py
+
 provider:
   name: aws
   runtime: python3.9
-  apiGateway:
-    apikeys:
-      - crud-serverless-users-apikey
   region: us-east-1
   environment:
     TABLE_NAME: usersTable
-    BUCKET : bucket-serverless-py-122
+    BUCKET: bucket-serverless-py-122
   iam:
     role:
       statements:
@@ -27,6 +25,9 @@ plugins:
   - serverless-python-requirements
   - serverless-offline
   - serverless-dynamodb
+  - serverless-apigateway-service-proxy
+  - serverless-lift
+
 
 package:
   individually: true
@@ -43,7 +44,6 @@ package:
     - '!.env'
     - '!*.zip'
 
-
 custom:
   serverless-dynamodb:
     stages:
@@ -57,24 +57,49 @@ custom:
     dockerizePip: false
     slim: true
     strip: true
+  
+  apiGatewayServiceProxies:
+    - sqs:
+        path: /likeuser
+        method: post
+        queueName: likeQueue
+        cors: true
+        responseMessage: "Success"
+
+constructs:
+  likeQueue:
+    type: queue
+    batchSize: 1
+    worker:
+      handler: src/users/likeUsers/handler.likeUser
+      reservedConcurrency: 1
+    extensions:
+      queueName: likeQueue
 
 functions:
+
+  authorizer:
+    handler: src/authorizer/handler.authorizer
+
   getUsers:
     handler: src/users/getUsers/handler.get_user
     events:
       - http: 
-          private: true
+          private: true   # <- exige API Key
           path: users/{id}
           method: GET
           request:
             parameters:
               paths:
                 id: true
+
   createUser:
     handler: src/users/createUsers/handler.create_user
     events:
       - http:
           path: users
+          authorizer: custom-Authorizer
+          resultTtlInSeconds: 15
           method: POST
           request:
             schemas:
@@ -92,7 +117,6 @@ functions:
                 id: true
             schemas:
               application/json: ${file(schemas/user-schema.json)}
-
 
   deleteUsers:
     handler: src/users/deleteUsers/handler.delete_user
@@ -130,7 +154,7 @@ functions:
           existing: true
           rules:
             - prefix: upload/
-  
+
 layers:
   base:
     path: layer
@@ -138,6 +162,36 @@ layers:
     compatibleRuntimes:
       - python3.9
 
+resources:
+  Resources:
+    ApiGatewayApiKey:
+      Type: AWS::ApiGateway::ApiKey
+      Properties:
+        Name: crud-serverless-users-apikey
+        Enabled: true
+        StageKeys:
+          - RestApiId: 
+              Ref: ApiGatewayRestApi
+            StageName: ${sls:stage}
 
+    ApiGatewayUsagePlan:
+      Type: AWS::ApiGateway::UsagePlan
+      Properties:
+        UsagePlanName: CrudUsersPlan
+        ApiStages:
+          - ApiId:
+              Ref: ApiGatewayRestApi
+            Stage: ${sls:stage}
 
- 
+    ApiGatewayUsagePlanKey:
+      Type: AWS::ApiGateway::UsagePlanKey
+      DependsOn:
+        - ApiGatewayApiKey
+        - ApiGatewayUsagePlan
+      Properties:
+        KeyId: 
+          Ref: ApiGatewayApiKey
+        KeyType: API_KEY
+        UsagePlanId: 
+          Ref: ApiGatewayUsagePlan
+
