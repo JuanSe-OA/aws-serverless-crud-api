@@ -1,11 +1,11 @@
-# 🚀 Proyecto Serverless con AWS Lambda, API Gateway, DynamoDB y S3
+#  Proyecto Serverless con AWS Lambda, API Gateway, DynamoDB y S3
 
 Este proyecto implementa una arquitectura **serverless** en AWS utilizando **API Gateway**, **AWS Lambda**, **DynamoDB**, **S3**, y **SQS**.  
 El objetivo es exponer un API CRUD seguro, con manejo de usuarios, subida de archivos e integración con generación de thumbnails.
 
 ---
 
-## 🛠️ Arquitectura
+## Arquitectura
 
 ![Arquitectura del Proyecto](docs/arquitectura.png)
 
@@ -19,17 +19,17 @@ El objetivo es exponer un API CRUD seguro, con manejo de usuarios, subida de arc
 
 ---
 
-## 📦 Funcionalidades
+##  Funcionalidades
 
-- ✅ API REST CRUD con DynamoDB.  
-- 🔐 Autenticación vía **Custom Authorizer**.  
-- 📂 Subida de archivos a S3.  
-- 🖼️ Generación automática de thumbnails.  
-- 📩 Procesamiento de eventos asincrónicos con SQS.  
+-  API REST CRUD con DynamoDB.  
+-  Autenticación vía **Custom Authorizer**.  
+-  Subida de archivos a S3.  
+-  Generación automática de thumbnails.  
+-  Procesamiento de eventos asincrónicos con SQS.  
 
 ---
 
-## 🚀 Despliegue
+## Despliegue
 
 1. Instalar dependencias:
 
